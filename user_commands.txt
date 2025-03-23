@@ -1,0 +1,140 @@
+# User Commands Reference for CyberTool
+# This file lists all commands you, as a user, would run to set up, execute, and test the CyberTool, along with their use cases.
+
+# 1. Project Setup Commands
+pip install -r requirements.txt
+# Use Case: Installs Python dependencies (requests, python-nmap, pymetasploit3, dnspython) 
+# required for the tool to function. Run this after cloning the project.
+
+chmod +x setup.sh
+# Use Case: Makes the 'setup.sh' script executable, allowing you to run it to automate setup.
+
+./setup.sh
+# Use Case: Runs the setup script to install system dependencies (nmap, tor, proxychains, 
+# metasploit-framework, go), Amass, and Python packages, with an option to start Tor.
+
+# 2. Tool Execution Commands
+python main.py http://example.com --owasp
+# Use Case: Runs a basic OWASP Top 10 vulnerability scan on the specified URL, 
+# checking for issues like SQL injection, XSS, and misconfigurations.
+
+python main.py http://example.com --pentest
+# Use Case: Executes basic pentest automation, including Nmap scanning, 
+# subdomain enumeration, directory brute-forcing, and basic exploit checks.
+
+python main.py http://example.com --owasp --pentest
+# Use Case: Combines OWASP and pentest scans on the target URL, 
+# providing a comprehensive security assessment.
+
+python main.py http://example.com --pentest --advanced
+# Use Case: Runs an advanced pentest with thorough Nmap scans (-A -p-), 
+# active Amass subdomain enumeration, Metasploit exploits, and (on Linux) LinPEAS checks.
+
+sudo python main.py http://example.com --pentest --anonymous
+# Use Case: Performs a pentest with Nmap in anonymous mode (20 decoys, fragmentation), 
+# requiring sudo for firewall evasion features.
+
+python main.py http://example.com --pentest --tor
+# Use Case: Executes a pentest with Nmap routed through Tor via Proxychains 
+# for enhanced anonymity, useful for stealthy reconnaissance.
+
+sudo python main.py http://example.com --pentest --advanced --tor --anonymous
+# Use Case: Runs a full-featured pentest with advanced scanning, Tor routing, 
+# anonymous Nmap settings, Metasploit exploits, and LinPEAS (if on Linux), requiring sudo.
+
+# 3. Testing and Verification Commands
+python -m http.server 8000
+# Use Case: Starts a simple local HTTP server on port 8000 for testing the tool 
+# against a controlled target (e.g., http://localhost:8000).
+
+curl --socks5 localhost:9050 https://check.torproject.org
+# Use Case: Verifies that Tor is working correctly by checking your IP through the Tor network, 
+# useful before running '--tor' scans.
+
+sudo systemctl start tor
+# Use Case: Manually starts the Tor service if you skipped it during setup.sh 
+# or need to restart it for '--tor' functionality.
+
+sudo systemctl status tor
+# Use Case: Checks the status of the Tor service to ensure it’s running 
+# (e.g., 'active (running)') before using '--tor'.
+
+msfrpcd -P password -S &
+# Use Case: Starts the Metasploit RPC daemon in the background with the password 'password' 
+# (no SSL), required for Metasploit integration in '--advanced' mode.
+
+netstat -tuln | grep 55552
+# Use Case: Verifies that the Metasploit RPC server is listening on port 55552, 
+# ensuring it’s ready for the tool to connect.
+
+nmap -v
+# Use Case: Checks if Nmap is installed and displays its version, 
+# confirming it’s available for scanning.
+
+proxychains -h
+# Use Case: Displays Proxychains help, verifying it’s installed and ready 
+# for Tor integration with Nmap.
+
+amass -version
+# Use Case: Confirms Amass is installed and shows its version, 
+# ensuring it’s ready for subdomain enumeration.
+
+msfconsole -v
+# Use Case: Checks the Metasploit Framework version, 
+# verifying it’s installed for exploit testing.
+
+ls -l report_*.txt
+# Use Case: Lists generated report files after running scans, 
+# allowing you to review findings (e.g., report_example.com.txt).
+
+cat report_example.com.txt
+# Use Case: Displays the contents of a specific report file to inspect scan results.
+
+# 4. Editing config.py
+nano config.py
+# Use Case: Opens 'config.py' in the nano editor to modify configuration settings 
+# (e.g., payloads, Metasploit password, wordlist paths) for customization.
+
+vim config.py
+# Use Case: Opens 'config.py' in the vim editor for editing, 
+# an alternative to nano for users preferring vim.
+
+echo "MSF_PASSWORD = 'newpass'" >> config.py
+# Use Case: Appends a new Metasploit password to 'config.py' without opening an editor, 
+# useful for quick updates (replace 'newpass' with your password).
+
+sed -i 's/MSF_PASSWORD = "password"/MSF_PASSWORD = "custompass"/' config.py
+# Use Case: Replaces the default Metasploit password 'password' with 'custompass' in 'config.py' 
+# using sed, automating configuration changes.
+
+# 5. Running Specific Modules Standalone
+python -c "from modules.owasp import OWASPScanner; scanner = OWASPScanner('http://example.com'); print(scanner.scan())"
+# Use Case: Runs the OWASP scanner standalone without 'main.py', 
+# useful for testing or integrating into other scripts.
+
+python -c "from modules.pentest.nmap_scan import NmapScanner; scanner = NmapScanner('example.com'); print(scanner.scan())"
+# Use Case: Executes an Nmap scan independently, 
+# allowing you to test Nmap functionality in isolation.
+
+python -c "from modules.pentest.subdomains import SubdomainEnumerator; enum = SubdomainEnumerator('http://example.com'); print(enum.enumerate())"
+# Use Case: Runs subdomain enumeration standalone, 
+# useful for debugging or focusing on subdomain discovery.
+
+python -c "from modules.pentest.dir_brute import DirectoryBruteForcer; brute = DirectoryBruteForcer('http://example.com'); print(brute.brute_force())"
+# Use Case: Performs directory brute-forcing independently, 
+# ideal for testing directory enumeration logic.
+
+python -c "from modules.pentest.exploits import ExploitTester; tester = ExploitTester('http://example.com', ['Nmap: Host 192.168.1.1 is up', 'Nmap: Port 80/tcp open - http']); print(tester.test_exploits())"
+# Use Case: Runs exploit testing standalone with mock Nmap findings, 
+# allowing isolated testing of Metasploit integration (ensure msfrpcd is running).
+
+python -c "from modules.pentest.linpeas import CustomLinPEAS; linpeas = CustomLinPEAS(); print(linpeas.run())"
+# Use Case: Executes the custom LinPEAS script independently on a Linux system, 
+# useful for privilege escalation testing without a full pentest.
+
+# Notes:
+# - Replace 'http://example.com' or 'example.com' with your target URL or IP.
+# - Use 'sudo' where required (e.g., '--anonymous', system service commands).
+# - Run commands from the 'cybertool/' directory unless specified otherwise.
+# - For standalone modules, some require prerequisites (e.g., msfrpcd for exploits, Linux for LinPEAS).
+# - Editing 'config.py' may require adjusting paths or values based on your setup.
