@@ -1,5 +1,4 @@
-cat << 'EOF' > README.md
-# CyberTool - Cybersecurity Automation Tool
+# CyberTool - Pentesting Automation Tool
 
 A Python-based tool for automating cybersecurity tasks, including OWASP Top 10 vulnerability scanning and penetration testing automation.
 
