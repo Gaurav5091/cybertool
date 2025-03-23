@@ -24,5 +24,5 @@ A Python-based tool for automating cybersecurity tasks, including OWASP Top 10 v
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Gaurav5091/cybertool
    cd cybertool
